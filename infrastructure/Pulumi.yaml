@@ -1,0 +1,7 @@
+name: trekking-agent
+description: TrekkingAgentV2 - Serverless microservices platform for trekking activity processing
+runtime: go
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-go
