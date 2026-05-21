@@ -1,0 +1,79 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+bin/
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Go
+*.exe
+*.test
+*.out
+go.work
+
+# Pulumi
+Pulumi.*.yaml
+!Pulumi.yaml
+!Pulumi.dev.yaml
+!Pulumi.staging.yaml
+!Pulumi.prod.yaml
+pulumi-state/
+*.pulumi.state
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Terraform (if any crossover)
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# AWS
+.aws/
+
+# Secrets
+**/secrets/
+**/credentials
+
+# Test outputs
+.coverage
+htmlcov/
+.pytest_cache/
+coverage/
+coverage.xml
+*.cover
