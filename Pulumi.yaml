@@ -1,8 +1,6 @@
 name: trekking-agent
 description: TrekkingAgentV2 - Serverless microservices platform for trekking activity processing
 runtime: go
-backend:
-  url: https://app.pulumi.com/adroszak-weirdo-codes
 main: infrastructure/
 config:
   pulumi:tags:
