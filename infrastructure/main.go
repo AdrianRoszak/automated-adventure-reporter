@@ -7,6 +7,7 @@ import (
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/s3"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/sns"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
 
 func main() {
@@ -70,13 +71,13 @@ func main() {
 
 		// Strava webhook handler - receives activity data from Strava
 		_, err = lambda.NewFunction(ctx, "stravaWebhookHandler", &lambda.FunctionArgs{
-			Name:        pulumi.String("arn:aws:lambda:eu-central-1:891377403759:function:stravaWebhookHandler"),
-			Role:        pulumi.String("arn:aws:iam::891377403759:role/service-role/stravaWebhookHandler-role-4sow3cz9"),
-			Runtime:     pulumi.String(lambda.RuntimePython3d14),
-			Handler:     pulumi.String("lambda_function.lambda_handler"),
-			PackageType: pulumi.String("Zip"),
+			Name:          pulumi.String("arn:aws:lambda:eu-central-1:891377403759:function:stravaWebhookHandler"),
+			Role:          pulumi.String("arn:aws:iam::891377403759:role/service-role/stravaWebhookHandler-role-4sow3cz9"),
+			Runtime:       pulumi.String(lambda.RuntimePython3d14),
+			Handler:       pulumi.String("lambda_function.lambda_handler"),
+			PackageType:   pulumi.String("Zip"),
 			Architectures: pulumi.StringArray{pulumi.String("x86_64")},
-			CodeSha256:  pulumi.String("ZfkUx8xRoNXNRTvM4x8cbOgkY57a+iVkb+rju7/ugzw="),
+			CodeSha256:    pulumi.String("ZfkUx8xRoNXNRTvM4x8cbOgkY57a+iVkb+rju7/ugzw="),
 			Environment: &lambda.FunctionEnvironmentArgs{
 				Variables: pulumi.StringMap{
 					"DYNAMODB_TABLE_NAME": stravaTable.Name,
@@ -96,14 +97,14 @@ func main() {
 
 		// Telegram voice downloader - downloads voice messages from Telegram
 		_, err = lambda.NewFunction(ctx, "telegramVoiceDownloader", &lambda.FunctionArgs{
-			Name:        pulumi.String("arn:aws:lambda:eu-central-1:891377403759:function:telegramVoiceDownloader"),
-			Role:        pulumi.String("arn:aws:iam::891377403759:role/service-role/telegramVoiceDownloader-role-kgpao31o"),
-			Runtime:     pulumi.String(lambda.RuntimePython3d14),
-			Handler:     pulumi.String("lambda_function.lambda_handler"),
-			PackageType: pulumi.String("Zip"),
+			Name:          pulumi.String("arn:aws:lambda:eu-central-1:891377403759:function:telegramVoiceDownloader"),
+			Role:          pulumi.String("arn:aws:iam::891377403759:role/service-role/telegramVoiceDownloader-role-kgpao31o"),
+			Runtime:       pulumi.String(lambda.RuntimePython3d14),
+			Handler:       pulumi.String("lambda_function.lambda_handler"),
+			PackageType:   pulumi.String("Zip"),
 			Architectures: pulumi.StringArray{pulumi.String("x86_64")},
-			CodeSha256:  pulumi.String("UdYcQr5EJhfWbAL/x0VVEzw7NFqFfwOYpwfzD1k2uXk="),
-			Timeout:     pulumi.Int(120),
+			CodeSha256:    pulumi.String("UdYcQr5EJhfWbAL/x0VVEzw7NFqFfwOYpwfzD1k2uXk="),
+			Timeout:       pulumi.Int(120),
 			Environment: &lambda.FunctionEnvironmentArgs{
 				Variables: pulumi.StringMap{
 					"BUCKET_NAME": audioInboundRaw.Bucket,
@@ -120,19 +121,22 @@ func main() {
 			return err
 		}
 
+		// Telegram bot token is stored in Pulumi config as a secret.
+		telegramToken := config.New(ctx, "").RequireSecret("telegramToken")
+
 		// Telegram to S3 ingestor - receives webhook from Telegram bot
 		_, err = lambda.NewFunction(ctx, "telegramToS3Ingestor", &lambda.FunctionArgs{
-			Name:        pulumi.String("arn:aws:lambda:eu-central-1:891377403759:function:telegramToS3Ingestor"),
-			Role:        pulumi.String("arn:aws:iam::891377403759:role/service-role/telegramToS3Ingestor-role-z25shvc7"),
-			Runtime:     pulumi.String(lambda.RuntimePython3d14),
-			Handler:     pulumi.String("lambda_function.lambda_handler"),
-			PackageType: pulumi.String("Zip"),
+			Name:          pulumi.String("arn:aws:lambda:eu-central-1:891377403759:function:telegramToS3Ingestor"),
+			Role:          pulumi.String("arn:aws:iam::891377403759:role/service-role/telegramToS3Ingestor-role-z25shvc7"),
+			Runtime:       pulumi.String(lambda.RuntimePython3d14),
+			Handler:       pulumi.String("lambda_function.lambda_handler"),
+			PackageType:   pulumi.String("Zip"),
 			Architectures: pulumi.StringArray{pulumi.String("x86_64")},
-			CodeSha256:  pulumi.String("7pDqad8KRd8dHhxyW/I6MnADhPmknl5SGwBuAXV5b04="),
+			CodeSha256:    pulumi.String("7pDqad8KRd8dHhxyW/I6MnADhPmknl5SGwBuAXV5b04="),
 			Environment: &lambda.FunctionEnvironmentArgs{
 				Variables: pulumi.StringMap{
 					"BUCKET_NAME":    audioInboundRaw.Bucket,
-					"TELEGRAM_TOKEN": pulumi.String("8629586691:AAGirGBtpprtHbu8RHSqTJRq3TRCQ9f0zUU"),
+					"TELEGRAM_TOKEN": telegramToken,
 				},
 			},
 			EphemeralStorage: &lambda.FunctionEphemeralStorageArgs{Size: pulumi.Int(512)},
@@ -148,13 +152,13 @@ func main() {
 
 		// Deepgram transcriber - transcribes audio using Deepgram API
 		_, err = lambda.NewFunction(ctx, "deepgramTranscriber", &lambda.FunctionArgs{
-			Name:        pulumi.String("arn:aws:lambda:eu-central-1:891377403759:function:deepgramTranscriber"),
-			Role:        pulumi.String("arn:aws:iam::891377403759:role/service-role/deepgramTranscriber-role-rcsyet8a"),
-			Runtime:     pulumi.String(lambda.RuntimePython3d14),
-			Handler:     pulumi.String("lambda_function.lambda_handler"),
-			PackageType: pulumi.String("Zip"),
+			Name:          pulumi.String("arn:aws:lambda:eu-central-1:891377403759:function:deepgramTranscriber"),
+			Role:          pulumi.String("arn:aws:iam::891377403759:role/service-role/deepgramTranscriber-role-rcsyet8a"),
+			Runtime:       pulumi.String(lambda.RuntimePython3d14),
+			Handler:       pulumi.String("lambda_function.lambda_handler"),
+			PackageType:   pulumi.String("Zip"),
 			Architectures: pulumi.StringArray{pulumi.String("x86_64")},
-			CodeSha256:  pulumi.String("0cHOR7AWuBCMrXG38Uh97J45RwtIEZm7ikVoGblI1FU="),
+			CodeSha256:    pulumi.String("0cHOR7AWuBCMrXG38Uh97J45RwtIEZm7ikVoGblI1FU="),
 			Environment: &lambda.FunctionEnvironmentArgs{
 				Variables: pulumi.StringMap{
 					"DEEPGRAM_API_KEY":  pulumi.String("4dd629033ac4fb230ec4f709d44120ebcb376ab8"),
