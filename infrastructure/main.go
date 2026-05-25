@@ -150,6 +150,9 @@ func main() {
 			return err
 		}
 
+		// Deepgram API key is stored in Pulumi config as a secret.
+		deepgramApiKey := config.New(ctx, "").RequireSecret("deepgramApiKey")
+
 		// Deepgram transcriber - transcribes audio using Deepgram API
 		_, err = lambda.NewFunction(ctx, "deepgramTranscriber", &lambda.FunctionArgs{
 			Name:          pulumi.String("arn:aws:lambda:eu-central-1:891377403759:function:deepgramTranscriber"),
@@ -161,7 +164,7 @@ func main() {
 			CodeSha256:    pulumi.String("0cHOR7AWuBCMrXG38Uh97J45RwtIEZm7ikVoGblI1FU="),
 			Environment: &lambda.FunctionEnvironmentArgs{
 				Variables: pulumi.StringMap{
-					"DEEPGRAM_API_KEY":  pulumi.String("4dd629033ac4fb230ec4f709d44120ebcb376ab8"),
+					"DEEPGRAM_API_KEY":  deepgramApiKey,
 					"TRANSCRIPT_BUCKET": transcriptsStorage.Bucket,
 				},
 			},
