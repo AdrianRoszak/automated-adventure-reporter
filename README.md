@@ -1,6 +1,6 @@
 # TrekkingAgentV2 — Automated Adventure Reporter
 
-> ⚠️ **Work in progress** — projekt jest w fazie aktywnego rozwoju. Architektura i API mogą ulegać zmianom.
+> ⚠️ **Work in progress** — this project is under active development. Architecture and APIs are subject to change.
 
 Serverless microservices platform for trekking activity processing with AI-powered agentic flow.
 Built with **Pulumi (Golang)** for IaC and **Python** for microservices.
